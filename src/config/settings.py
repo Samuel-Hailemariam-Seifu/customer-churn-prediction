@@ -22,8 +22,11 @@ class ModelConfig:
 
 @dataclass(frozen=True)
 class DataConfig:
-    dataset_url: str = (
-        "https://raw.githubusercontent.com/blastchar/telco-customer-churn/master/WA_Fn-UseC_-Telco-Customer-Churn.csv"
+    dataset_urls: List[str] = field(
+        default_factory=lambda: [
+            "https://raw.githubusercontent.com/IBM/telco-customer-churn-on-icp4d/master/data/Telco-Customer-Churn.csv",
+            "https://raw.githubusercontent.com/sonarsushant/IBM-Telco-Customer-Churn-Analysis/master/Telco-Customer-Churn.csv",
+        ]
     )
     local_dataset_path: Path = DATA_DIR / "telco_churn.csv"
     target_column: str = "Churn"

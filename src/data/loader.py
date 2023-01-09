@@ -1,5 +1,7 @@
 from pathlib import Path
 
+from urllib.error import URLError, HTTPError
+
 import pandas as pd
 
 from src.config.settings import get_config
@@ -13,9 +15,18 @@ def load_dataset(force_refresh: bool = False) -> pd.DataFrame:
         return pd.read_csv(local_path)
 
     local_path.parent.mkdir(parents=True, exist_ok=True)
-    df = pd.read_csv(config.dataset_url)
-    df.to_csv(local_path, index=False)
-    return df
+    last_error = None
+    for url in config.dataset_urls:
+        try:
+            df = pd.read_csv(url)
+            df.to_csv(local_path, index=False)
+            return df
+        except (URLError, HTTPError, ValueError) as exc:
+            last_error = exc
+
+    raise RuntimeError(
+        f"Failed to download dataset from configured URLs. Last error: {last_error}"
+    )
 
 
 def standardize_dataframe(df: pd.DataFrame) -> pd.DataFrame:

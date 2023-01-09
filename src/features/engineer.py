@@ -31,10 +31,12 @@ def add_engineered_features(df: pd.DataFrame) -> pd.DataFrame:
     ]
     available_service_cols = [c for c in service_cols if c in out.columns]
     if available_service_cols:
-        normalized = out[available_service_cols].astype(str).applymap(
-            lambda x: 0
-            if x.strip().lower() in {"no", "no internet service", "no phone service"}
-            else 1
+        normalized = out[available_service_cols].astype(str).apply(
+            lambda col: col.map(
+                lambda x: 0
+                if x.strip().lower() in {"no", "no internet service", "no phone service"}
+                else 1
+            )
         )
         out["service_count"] = normalized.sum(axis=1)
 
