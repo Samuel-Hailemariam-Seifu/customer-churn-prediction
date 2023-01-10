@@ -1,4 +1,8 @@
+from pathlib import Path
+
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 
 from src.api.schemas import CustomerRequest, PredictionResponse
 from src.config.settings import get_config
@@ -7,6 +11,8 @@ from src.utils.logger import get_logger
 
 app = FastAPI(title="Customer Churn Prediction API", version="1.0.0")
 logger = get_logger(get_config().logger_name)
+STATIC_DIR = Path(__file__).resolve().parent / "static"
+app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 try:
     predictor = ChurnPredictor()
@@ -17,7 +23,12 @@ except Exception as exc:
 
 @app.get("/health")
 def health_check():
-    return {"status": "ok"}
+    return {"status": "ready"}
+
+
+@app.get("/")
+def ui():
+    return FileResponse(STATIC_DIR / "index.html")
 
 
 @app.post("/predict_proba", response_model=PredictionResponse)

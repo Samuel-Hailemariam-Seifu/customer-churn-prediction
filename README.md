@@ -133,6 +133,14 @@ Endpoints:
 - `POST /predict`
 - `POST /predict_proba`
 - `GET /health`
+- `GET /` (simple web UI)
+
+### Web UI
+
+After starting the API, open:
+- `http://127.0.0.1:8000/`
+
+The UI provides a customer input form and calls `/predict` under the hood.
 
 ### Example Request
 

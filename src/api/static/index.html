@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Customer Churn Predictor</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        background: #f4f6f8;
+        color: #1f2937;
+      }
+      .container {
+        max-width: 1100px;
+        margin: 24px auto;
+        padding: 0 16px;
+      }
+      .card {
+        background: #ffffff;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+        padding: 20px;
+      }
+      h1 {
+        margin-top: 0;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 12px;
+      }
+      label {
+        display: block;
+        font-size: 13px;
+        margin-bottom: 6px;
+      }
+      input,
+      select {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+      }
+      .actions {
+        margin-top: 16px;
+        display: flex;
+        gap: 12px;
+      }
+      button {
+        padding: 10px 14px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+      }
+      #predictBtn {
+        background: #2563eb;
+        color: #fff;
+      }
+      #resetBtn {
+        background: #e2e8f0;
+      }
+      .result {
+        margin-top: 18px;
+        padding: 12px;
+        border-radius: 8px;
+        background: #eff6ff;
+        border: 1px solid #bfdbfe;
+      }
+      .error {
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+      }
+      .small {
+        font-size: 12px;
+        color: #6b7280;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="card">
+        <h1>Customer Churn Predictor</h1>
+        <p class="small">Enter customer account and service details, then run prediction.</p>
+        <form id="predictForm">
+          <div class="grid">
+            <div>
+              <label>Gender</label>
+              <select name="gender">
+                <option>Female</option>
+                <option>Male</option>
+              </select>
+            </div>
+            <div>
+              <label>Senior Citizen</label>
+              <select name="SeniorCitizen">
+                <option value="0">0</option>
+                <option value="1">1</option>
+              </select>
+            </div>
+            <div>
+              <label>Partner</label>
+              <select name="Partner"><option>Yes</option><option>No</option></select>
+            </div>
+            <div>
+              <label>Dependents</label>
+              <select name="Dependents"><option>No</option><option>Yes</option></select>
+            </div>
+            <div>
+              <label>Tenure (months)</label>
+              <input type="number" name="tenure" value="6" step="1" min="0" />
+            </div>
+            <div>
+              <label>PhoneService</label>
+              <select name="PhoneService"><option>Yes</option><option>No</option></select>
+            </div>
+            <div>
+              <label>MultipleLines</label>
+              <select name="MultipleLines">
+                <option>No</option>
+                <option>Yes</option>
+                <option>No phone service</option>
+              </select>
+            </div>
+            <div>
+              <label>InternetService</label>
+              <select name="InternetService"><option>Fiber optic</option><option>DSL</option><option>No</option></select>
+            </div>
+            <div>
+              <label>OnlineSecurity</label>
+              <select name="OnlineSecurity"><option>No</option><option>Yes</option><option>No internet service</option></select>
+            </div>
+            <div>
+              <label>OnlineBackup</label>
+              <select name="OnlineBackup"><option>No</option><option>Yes</option><option>No internet service</option></select>
+            </div>
+            <div>
+              <label>DeviceProtection</label>
+              <select name="DeviceProtection"><option>No</option><option>Yes</option><option>No internet service</option></select>
+            </div>
+            <div>
+              <label>TechSupport</label>
+              <select name="TechSupport"><option>No</option><option>Yes</option><option>No internet service</option></select>
+            </div>
+            <div>
+              <label>StreamingTV</label>
+              <select name="StreamingTV"><option>No</option><option>Yes</option><option>No internet service</option></select>
+            </div>
+            <div>
+              <label>StreamingMovies</label>
+              <select name="StreamingMovies"><option>No</option><option>Yes</option><option>No internet service</option></select>
+            </div>
+            <div>
+              <label>Contract</label>
+              <select name="Contract"><option>Month-to-month</option><option>One year</option><option>Two year</option></select>
+            </div>
+            <div>
+              <label>PaperlessBilling</label>
+              <select name="PaperlessBilling"><option>Yes</option><option>No</option></select>
+            </div>
+            <div>
+              <label>PaymentMethod</label>
+              <select name="PaymentMethod">
+                <option>Electronic check</option>
+                <option>Mailed check</option>
+                <option>Bank transfer (automatic)</option>
+                <option>Credit card (automatic)</option>
+              </select>
+            </div>
+            <div>
+              <label>MonthlyCharges</label>
+              <input type="number" name="MonthlyCharges" value="89.5" step="0.01" min="0" />
+            </div>
+            <div>
+              <label>TotalCharges</label>
+              <input type="number" name="TotalCharges" value="537.0" step="0.01" min="0" />
+            </div>
+          </div>
+          <div class="actions">
+            <button id="predictBtn" type="submit">Predict Churn</button>
+            <button id="resetBtn" type="reset">Reset</button>
+          </div>
+        </form>
+        <div id="result" class="result" style="display: none"></div>
+      </div>
+    </div>
+
+    <script>
+      function toNumber(value) {
+        const n = Number(value);
+        return Number.isNaN(n) ? null : n;
+      }
+
+      const form = document.getElementById("predictForm");
+      const resultBox = document.getElementById("result");
+
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        resultBox.style.display = "none";
+        resultBox.className = "result";
+
+        const formData = new FormData(form);
+        const payload = {};
+        for (const [key, value] of formData.entries()) {
+          if (["SeniorCitizen", "tenure", "MonthlyCharges", "TotalCharges"].includes(key)) {
+            payload[key] = toNumber(value);
+          } else {
+            payload[key] = value;
+          }
+        }
+
+        try {
+          const response = await fetch("/predict", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+          const data = await response.json();
+
+          if (!response.ok) {
+            throw new Error(data.detail || "Request failed");
+          }
+
+          const verdict = data.churn_prediction === 1 ? "Likely to churn" : "Likely to stay";
+          resultBox.innerHTML =
+            "<strong>Result:</strong> " + verdict + "<br/>" +
+            "<strong>Churn probability:</strong> " + data.churn_probability.toFixed(4) + "<br/>" +
+            "<strong>Threshold:</strong> " + data.threshold_used;
+          resultBox.style.display = "block";
+        } catch (err) {
+          resultBox.className = "result error";
+          resultBox.innerHTML = "<strong>Error:</strong> " + err.message;
+          resultBox.style.display = "block";
+        }
+      });
+    </script>
+  </body>
+</html>
